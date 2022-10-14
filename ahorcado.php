@@ -18,6 +18,7 @@ $frases = [
     "Rio Segura"
 ];
 
+
 function dibujo1(){
     echo "\n";
     echo "Juego del ahorcado\n";
@@ -116,12 +117,16 @@ function pedirLetra(): string
 
     do {
         echo "\n";
-        $letra = readline("Dime una letra: ");
+        $letra = readline("Dime una letra: \n");
         echo "\n";
         if(mb_strlen($letra) != 1) { 
+            echo "\n";
             echo "Error: '$letra'  no es una letra\n";
+            echo "\n";
         } else if ($letra >= 0 && $letra <= 9) {
+            echo "\n";
             echo "Error: no es un letra\n";
+            echo "\n";
         } else {
             $valido = true;
         }
@@ -167,41 +172,190 @@ $frase = mb_str_split($frases[$clave], 1, "UTF-8");
 //Por cada carácter se genera un guión y si hay un espacio no se genera
 $enmascarada = array_map(fn($c) => $c == " " ? "  " : "_", $frase);
 //Recorre el array enmascarado para imprimirlo
-foreach($enmascarada as $c) {
-    echo $c;
-}
-echo "\n";
-echo "\n";
-echo "$frases[$clave] \n";
-echo "\n";
 
-//Principal
-dibujo1();
-do { 
 
-    if(coincideLetra(pedirLetra(),$frase,$enmascarada) == 0){
-            $oportunidades--;
-            if($oportunidades == 5){
-                dibujo2();   
-            }else if($oportunidades == 4){
-                dibujo3();   
-            }else if($oportunidades == 3){
-                dibujo4();   
-            }else if($oportunidades == 2){
-                dibujo5();   
-            }else if($oportunidades == 1){
-                dibujo6();   
-            }else if($oportunidades == 0){
-                dibujo7();   
-            }
+function resolver():int{
 
-            echo "\n";
-            echo "Te quedan $oportunidades oportunidades"; 
-            echo "\n";
+    echo "\n";
+    $valor = readline("¿Quieres resolver? s:Si  n:No\n");
+    echo "\n";
+    $numero = 0;
+    if(mb_strtolower($valor) == "n"){
+        $numero = 1;
+    } else if(mb_strtolower($valor) == "s"){
+        $numero = 2;
+    } else {
+        echo "\n";
+        echo "Error: escribe s para si o n para no. \n";
+        echo "\n";
+        $numero = 0;
     }
 
-    $victoria = $frase == $enmascarada;
-        
+    return $numero;
+}
+
+
+function imprimirEnmascarada($enmascarada,$frases,$clave){
+    foreach($enmascarada as $c) {
+        echo $c;
+    }
+    echo "\n";
+    echo "\n";
+    echo "$frases[$clave] \n";
+    echo "\n";
+
+}
+
+function imprimirOportunidades($oportunidades){
+    echo "\n";
+    echo "Te quedan $oportunidades oportunidades"; 
+    echo "\n";
+}
+
+//Principal
+$victoria = false;
+//Imprime el primer dibujo
+dibujo1();
+imprimirEnmascarada($enmascarada,$frases,$clave);
+
+//$acierto = coincideLetra(pedirLetra(),$frase,$enmascarada);
+
+do { 
+    $acierto = coincideLetra(pedirLetra(),$frase,$enmascarada);
+    //Si hay una letra imprime el dibujo y la enmascarada con la letra sustituida
+    if($acierto > 0){
+        dibujo1();
+        imprimirEnmascarada($enmascarada,$frases,$clave);
+
+        //Si quieres resolver
+        if(resolver() == 2){
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+            $fraseTemp = readline("Escibe la frase: \n");
+            $fraseTemp = mb_strtolower($fraseTemp);
+
+            //echo $fraseTemp, "\n";
+            //echo implode("", $frase), "\n";
+
+            //Si acierta la frase
+            if($fraseTemp == mb_strtolower(implode("", $frase))){ 
+                imprimirEnmascarada($enmascarada,$frases,$clave);            
+                echo "Felicidades has acertado\n";
+                $victoria = true;
+            //Si no acierta la frase
+            } else {
+                //Resta una oportunidad
+                $oportunidades--;
+                imprimirEnmascarada($enmascarada,$frases,$clave);
+                echo "Lo siento, no es correcto\n";
+                imprimirOportunidades($oportunidades);
+                //Si tiene 5 oportunidades
+                if($oportunidades == 5){
+                    dibujo2();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);   
+                
+
+                } else if($oportunidades == 4){
+                    dibujo3();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+                 
+
+                } else if($oportunidades == 3){
+                    dibujo4();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+                  
+
+                }else if($oportunidades == 2){
+                    dibujo5();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+                 
+
+                } else if($oportunidades == 1){
+                    dibujo6();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+                      
+
+                } else if($oportunidades == 0){
+                    dibujo7();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+                    echo "Has perdido\n";  
+                }             
+            }
+        //Si no se quiere resolver
+        } else {
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+
+            if($acierto == 0){
+                $oportunidades--;
+
+                if($oportunidades == 5){
+                    dibujo2();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);   
+                
+    
+                } else if($oportunidades == 4){
+                    dibujo3();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+ 
+    
+                } else if($oportunidades == 3){
+                    dibujo4();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+ 
+    
+                } else if($oportunidades == 2){
+                    dibujo5();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+
+    
+                } else if($oportunidades == 1){
+                    dibujo6();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);   
+    
+                } else if($oportunidades == 0){
+                    dibujo7();
+                    imprimirEnmascarada($enmascarada,$frases,$clave);
+                    echo "Has perdido\n";  
+                }
+
+            }
+            
+          }
+    //Si se falla
+    } else {
+        $oportunidades--;
+        imprimirEnmascarada($enmascarada,$frases,$clave);
+
+        if($oportunidades == 5){
+            dibujo2();  
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+
+
+        } else if($oportunidades == 4){
+            dibujo3();
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+  
+
+        } else if($oportunidades == 3){
+            dibujo4();
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+ 
+
+        } else if($oportunidades == 2){
+            dibujo5();
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+
+             
+        } else if($oportunidades == 1){
+            dibujo6();
+            imprimirEnmascarada($enmascarada,$frases,$clave);
+
+
+        }else if($oportunidades == 0){
+            dibujo7();
+            echo "Has perdido\n";   
+        }
+    }         
+      
 } while ($oportunidades != 0 && !$victoria);
 
 
